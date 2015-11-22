@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  qid: 1
+  name: MyString
+  status: 1
+  guess: 1
+  heuristic: 1
+  decision: 1
+
+two:
+  qid: 1
+  name: MyString
+  status: 1
+  guess: 1
+  heuristic: 1
+  decision: 1
