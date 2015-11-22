@@ -106,7 +106,7 @@ module Authorlang
           [{type: 'buttons', 
           entries: 
             [{type: 'green', decision: 'yes', label: 'Yes', api_action: 
-              {action: 'wbcreateclaim', entity: "Q#{tile.qid}", property: 'P1412', snaktype: 'value', value: '{"entity-type":"item", "numeric-id":'+tile.qid.to_s+'}' }},
+              {action: 'wbcreateclaim', entity: "Q#{tile.qid}", property: 'P1412', snaktype: 'value', value: '{"entity-type":"item", "numeric-id":'+tile.guess.to_s+'}' }},
           {type: 'white', decision: 'skip', label: 'not sure'}, {type: 'blue', decision: 'no', label: 'No'} ]}]}
       end
     end
