@@ -90,7 +90,7 @@ module Authorlang
     return ret
   end
   def assign_tile
-    a = Author.find(:first, conditions: { status: READY_FOR_HUMAN})
+    a = Author.where(status: READY_FOR_HUMAN).first
     a.status = ASSIGNED
     a.save!
     return a
@@ -98,7 +98,7 @@ module Authorlang
   def get_tiles(numparam)
     num = numparam.to_i || 1
     ret = []
-    0..num.each do |i|
+    (1..num).each do |i|
       tile = assign_tile
       ret << {id: tile.id, sections: [{type: 'item', q: "Q#{tile.qid}"}], controls: 
         [{type: 'buttons', 
