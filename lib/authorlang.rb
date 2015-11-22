@@ -15,7 +15,8 @@ CITIZENSHIP = 2
 NONE = 0
 NO_GUESS = 1
 READY_FOR_HUMAN = 2
-DONE = 3
+ASSIGNED = 3
+DONE = 4
 
 module Authorlang
   def ingest
@@ -86,6 +87,26 @@ module Authorlang
       end
     end # TODO: anything intelligent we can guess if more than one country listed? 
     #  
+    return ret
+  end
+  def assign_tile
+    a = Author.find(:first, conditions: { status: READY_FOR_HUMAN})
+    a.status = ASSIGNED
+    a.save!
+    return a
+  end
+  def get_tiles(numparam)
+    num = numparam.to_i || 1
+    ret = []
+    0..num.each do |i|
+      tile = assign_tile
+      ret << {id: tile.id, sections: [{type: 'item', q: "Q#{tile.qid}"}], controls: 
+        [{type: 'buttons', 
+        entries: 
+          [{type: 'green', decision: 'yes', label: 'Yes', api_action: 
+            {action: 'wbcreateclaim', entity: "Q#{tile.qid}", property: 'P1412', snaktype: 'value', value: '{"entity-type":"item", "numeric-id":'+tile.qid.to_s+'}' }},
+        {type: 'white', decision: 'skip', label: 'not sure'}, {type: 'blue', decision: 'no', label: 'No'} ]}]}
+    end
     return ret
   end
 end
