@@ -91,6 +91,7 @@ module Authorlang
   end
   def assign_tile
     a = Author.find(:first, conditions: { status: READY_FOR_HUMAN})
+    return nil if a.nil?
     a.status = ASSIGNED
     a.save!
     return a
@@ -100,12 +101,14 @@ module Authorlang
     ret = []
     0..num.each do |i|
       tile = assign_tile
-      ret << {id: tile.id, sections: [{type: 'item', q: "Q#{tile.qid}"}], controls: 
-        [{type: 'buttons', 
-        entries: 
-          [{type: 'green', decision: 'yes', label: 'Yes', api_action: 
-            {action: 'wbcreateclaim', entity: "Q#{tile.qid}", property: 'P1412', snaktype: 'value', value: '{"entity-type":"item", "numeric-id":'+tile.qid.to_s+'}' }},
-        {type: 'white', decision: 'skip', label: 'not sure'}, {type: 'blue', decision: 'no', label: 'No'} ]}]}
+      unless tile.nil?
+        ret << {id: tile.id, sections: [{type: 'item', q: "Q#{tile.qid}"}], controls: 
+          [{type: 'buttons', 
+          entries: 
+            [{type: 'green', decision: 'yes', label: 'Yes', api_action: 
+              {action: 'wbcreateclaim', entity: "Q#{tile.qid}", property: 'P1412', snaktype: 'value', value: '{"entity-type":"item", "numeric-id":'+tile.qid.to_s+'}' }},
+          {type: 'white', decision: 'skip', label: 'not sure'}, {type: 'blue', decision: 'no', label: 'No'} ]}]}
+      end
     end
     return ret
   end
