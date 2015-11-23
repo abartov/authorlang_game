@@ -11,19 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151121162345) do
+ActiveRecord::Schema.define(version: 20151123125539) do
 
   create_table "authors", force: :cascade do |t|
-    t.integer  "qid"
-    t.string   "name"
-    t.integer  "status"
-    t.integer  "guess"
-    t.integer  "heuristic"
-    t.integer  "decision"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.integer  "qid",        limit: 4
+    t.string   "name",       limit: 255
+    t.integer  "status",     limit: 4
+    t.integer  "guess",      limit: 4
+    t.integer  "heuristic",  limit: 4
+    t.integer  "decision",   limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "username",   limit: 255
+    t.integer  "other_qid",  limit: 4
   end
 
-  add_index "authors", ["qid"], name: "index_authors_on_qid", unique: true
+  add_index "authors", ["qid"], name: "index_authors_on_qid", unique: true, using: :btree
 
 end

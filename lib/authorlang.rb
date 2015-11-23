@@ -57,6 +57,7 @@ module Authorlang
        auth.guess = guess[:guess]
        auth.heuristic = guess[:heuristic]
        auth.status = READY_FOR_HUMAN
+       auth.other_qid = guess[:other_qid]
      end
      auth.save!
     }
@@ -71,7 +72,7 @@ module Authorlang
     if works.count > 0
       worklangs = works.first.properties('P364') # original language
       if worklangs.count > 0
-        return {heuristic: NOTABLE_WORK, guess: worklangs.first.id[1..-1].to_i} # offer language of notable work as a guess
+        return {heuristic: NOTABLE_WORK, guess: worklangs.first.id[1..-1].to_i, other_qid: works.first.id[1..-1].to_i} # offer language of notable work as a guess
       end
     end
     # by country?
@@ -82,7 +83,7 @@ module Authorlang
       if off_langs.count > 0
         # some countries (e.g. USA) don't have an official language
         unless off_langs.first.nil?
-          return {heuristic: CITIZENSHIP, guess: off_langs.first.id[1..-1].to_i} # offer first official language as a guess
+          return {heuristic: CITIZENSHIP, guess: off_langs.first.id[1..-1].to_i, other_qid: country.id[1..-1].to_i} # offer first official language as a guess
         end
       end
     end # TODO: anything intelligent we can guess if more than one country listed? 
@@ -96,16 +97,38 @@ module Authorlang
     a.save!
     return a
   end
-  def get_tiles(numparam)
+  def label_for_guess(tile, lang) 
+    item = Wikidata::Item.find("Q#{tile.guess}")
+    return 'ERROR' if item.nil?
+    return item.labels[lang].value
+  end
+  def reason_for_guess(tile, lang)
+    item = Wikidata::Item.find("Q#{tile.other_qid}")
+    return 'ERROR' if item.nil?
+    lbl = item.labels[lang].value
+    lbl = item.labels['en'].value if lbl.nil? # fall back to English if no label requested lang
+    lbl = item.labels.first if lbl.nil? # fall back to any label if no English
+    case tile.heuristic 
+    when CITIZENSHIP
+      return "it is spoken in #{lbl}"
+    when NOTABLE_WORK
+      return "s/he is the author of #{lbl}, which is originally in this language."
+    else
+      return 'ERROR'
+    end
+  end
+  def get_tiles(numparam, lang)
     num = numparam.to_i || 1
     ret = []
     (1..num).each do |i|
       tile = assign_tile
       unless tile.nil?
-        ret << {id: tile.id, sections: [{type: 'item', q: "Q#{tile.qid}"}], controls: 
+        lbl = label_for_guess(tile, lang)
+        reason = reason_for_guess(tile, lang)
+        ret << {id: tile.id, sections: [{type: 'item', q: "Q#{tile.qid}"}, {type: 'text', text: "#{lbl} because #{reason}"}], controls: 
           [{type: 'buttons', 
           entries: 
-            [{type: 'green', decision: 'yes', label: 'Yes', api_action: 
+            [{type: 'green', decision: 'yes', label: lbl, api_action: 
               {action: 'wbcreateclaim', entity: "Q#{tile.qid}", property: 'P1412', snaktype: 'value', value: '{"entity-type":"item", "numeric-id":'+tile.guess.to_s+'}' }},
           {type: 'white', decision: 'skip', label: 'not sure'}, {type: 'blue', decision: 'no', label: 'No'} ]}]}
       end

@@ -10,7 +10,7 @@ class GameController < ApplicationController
   end
 
   def tiles
-    @tiles = get_tiles(params['num'])
+    @tiles = get_tiles(params['num'], params['lang'])
     resp = {tiles: @tiles}
     render :json => resp.to_json, :callback => params['callback']
   end
