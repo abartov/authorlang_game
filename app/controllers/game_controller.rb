@@ -20,14 +20,14 @@ class GameController < ApplicationController
     unless a.nil?
       a.status = DONE
       a.decision = params['decision'] == 'yes' ? YES : NO
-      a.username = params['username']
+      a.username = params['user']
       a.save!
     end
     render nothing: true
   end
   def main
     # the distributed Wikidata Game API uses the reserved 'action' parameter, so we need to grab it from the raw query string
-    request.query_string =~ /action=([a-z]*)/
+    request.query_string =~ /action=([a-z_]*)/
     q = $1
     case q
     when 'desc'
