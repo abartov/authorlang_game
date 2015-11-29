@@ -5,7 +5,7 @@ class GameController < ApplicationController
   skip_before_filter :verify_authenticity_token
 
   def desc
-    resp = {label: {en: "Author Language game"}, description: {en: "populate the Languages written and spoken (P1412) property by guessing from notable works or citizenship.  Report problems to [https://wikidata.org/wiki/User:Ijon Asaf Bartov]"}, icon: 'http://authorlang.benyehuda.org/P1412.jpg'}
+    resp = {label: {en: "Author Language game"}, description: {en: "populate the Languages written and spoken (P1412) property by guessing from notable works or citizenship.  Report problems to User:Ijon"}, icon: 'https://tools.wmflabs.org/authorlang-game/P1412.jpg'}
     render :json => resp.to_json, :callback => params['callback']
   end
 
