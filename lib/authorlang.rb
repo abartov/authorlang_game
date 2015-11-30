@@ -69,7 +69,7 @@ module Authorlang
     item = Wikidata::Item.find("Q#{author.qid}")
     # by language of associated work?
     works = item.properties("P800") # notable works
-    if works.count > 0
+    if works.count > 0 and not (works.first.nil?)
       worklangs = works.first.properties('P364') # original language
       if worklangs.count > 0
         return {heuristic: NOTABLE_WORK, guess: worklangs.first.id[1..-1].to_i, other_qid: works.first.id[1..-1].to_i} # offer language of notable work as a guess
