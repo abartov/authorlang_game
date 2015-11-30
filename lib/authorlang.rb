@@ -67,6 +67,7 @@ module Authorlang
     ret = {}
     # heuristics
     item = Wikidata::Item.find("Q#{author.qid}")
+    return ret if item.nil?
     # by language of associated work?
     works = item.properties("P800") # notable works
     if works.count > 0 and not (works.first.nil?)
