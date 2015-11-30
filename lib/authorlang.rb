@@ -77,7 +77,7 @@ module Authorlang
     end
     # by country?
     countries = item.properties("P27")
-    if countries.count == 1
+    if countries.count == 1 and not (countries.first.nil?)
       country = countries.first
       off_langs = country.properties("P37")
       if off_langs.count > 0
