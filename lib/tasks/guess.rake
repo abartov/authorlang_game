@@ -9,7 +9,6 @@ task :guess, [:maxnum] => :environment do |taskname, args|
   guess_langs(args.maxnum)
   print_stats
 end
-protected
 def print_stats
   guess_ready = Author.where(status: READY_FOR_HUMAN).count
   done = Author.where(status: DONE).count
