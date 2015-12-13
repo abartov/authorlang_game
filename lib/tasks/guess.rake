@@ -10,8 +10,10 @@ task :guess, [:maxnum] => :environment do |taskname, args|
   print_stats
 end
 def print_stats
+  total = Author.count
   guess_ready = Author.where(status: READY_FOR_HUMAN).count
   done = Author.where(status: DONE).count
   assigned = Author.where(status: ASSIGNED).count
-  puts "#{guess_ready} guesses ready; #{done} done; #{assigned} assigned"
+  no_guess = Author.where(status: NO_GUESS).count
+  puts "Of a total of #{total} authors originally without P1412:\n#{guess_ready} guesses ready; #{done} done; #{assigned} assigned; #{no_guess} with no guess"
 end
