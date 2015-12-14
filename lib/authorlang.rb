@@ -58,6 +58,7 @@ module Authorlang
        auth.heuristic = guess[:heuristic]
        auth.status = READY_FOR_HUMAN
        auth.other_qid = guess[:other_qid]
+       auth.bucket = rand(200)
      end
      auth.save!
     }
@@ -92,7 +93,7 @@ module Authorlang
     return ret
   end
   def assign_tile
-    a = Author.where(status: READY_FOR_HUMAN).first
+    a = Author.where(status: READY_FOR_HUMAN).order(bucket: :asc).first
     return nil if a.nil?
     a.status = ASSIGNED
     a.save!
