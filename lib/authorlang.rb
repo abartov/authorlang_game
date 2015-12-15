@@ -18,6 +18,11 @@ READY_FOR_HUMAN = 2
 ASSIGNED = 3
 DONE = 4
 
+# some hard-coded Q numbers
+Q_ENGLISH = 1860
+Q_USA = 30
+Q_BELGIUM = 31
+
 module Authorlang
   def ingest
     puts "querying..."
@@ -81,11 +86,21 @@ module Authorlang
     countries = item.properties("P27")
     if countries.count == 1 and not (countries.first.nil?)
       country = countries.first
+
+      # exceptions
+      break if country.id[1..-1].to_i == Q_BELGIUM # don't mess with Belgian language politics :)
+
       off_langs = country.properties("P37")
       if off_langs.count > 0
-        # some countries (e.g. USA) don't have an official language
         unless off_langs.first.nil?
+          # exceptions
+          
           return {heuristic: CITIZENSHIP, guess: off_langs.first.id[1..-1].to_i, other_qid: country.id[1..-1].to_i} # offer first official language as a guess
+        end
+      else
+        if country.id[1..-1].to_i == Q_USA
+          # The US doesn't have an official language, but it's still practical t offer a guess of English.
+          return {heuristic: CITIZENSHIP, guess: Q_ENGLISH, other_qid: Q_USA}
         end
       end
     end # TODO: anything intelligent we can guess if more than one country listed? 
