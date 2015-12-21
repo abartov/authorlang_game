@@ -1,6 +1,6 @@
 require 'linkeddata'
 #require 'qlabel'
-#require 'mediawiki_api'
+require 'mediawiki_api'
 #require 'wikidata'
 
 # decisions
@@ -18,10 +18,13 @@ READY_FOR_HUMAN = 2
 ASSIGNED = 3
 DONE = 4
 
-# some hard-coded Q numbers
+# some hard-coded Q numbers for some optimizations
 Q_ENGLISH = 1860
 Q_USA = 30
 Q_BELGIUM = 31
+Q_INDIA = 668
+Q_GERMAN = 188
+Q_FRENCH = 150
 
 module Authorlang
   def ingest
@@ -50,20 +53,25 @@ module Authorlang
   end
 
   def guess_langs(max)
+    mw = {} # MW API clients for languages we want to extract italicized text from
+    ['en','de','fr'].each {|lang| mw[lang] = MediawikiApi::Client.new("https://#{lang}.wikipedia.org/w/api.php") }
+
     puts "coming up with some guesses..."
     a = Author.where(status: NONE).limit(max)
     return if a.nil?
     a.each {|auth| 
-     puts "attempting to guess a language for Q#{auth.qid}"
+     print "attempting to guess a language for Q#{auth.qid}..."
      guess = guess_lang(auth)
      if guess.empty?
        auth.status = NO_GUESS
      else
+       italics = italics_from_article(auth.qid, mw)
        auth.guess = guess[:guess]
        auth.heuristic = guess[:heuristic]
        auth.status = READY_FOR_HUMAN
        auth.other_qid = guess[:other_qid]
        auth.bucket = rand(200)
+       auth.italics = italics
      end
      auth.save!
     }
@@ -88,13 +96,10 @@ module Authorlang
       country = countries.first
 
       # exceptions
-      break if country.id[1..-1].to_i == Q_BELGIUM # don't mess with Belgian language politics :)
-
+      return ret if [Q_BELGIUM, Q_INDIA].include? country.id[1..-1].to_i # Make no assumptions about India, and don't mess with Belgian language politics :)
       off_langs = country.properties("P37")
       if off_langs.count > 0
         unless off_langs.first.nil?
-          # exceptions
-          
           return {heuristic: CITIZENSHIP, guess: off_langs.first.id[1..-1].to_i, other_qid: country.id[1..-1].to_i} # offer first official language as a guess
         end
       else
@@ -134,6 +139,33 @@ module Authorlang
       return 'ERROR'
     end
   end
+  def italics_from_article(qid, mw, guessed_lang)
+    # heuristic: if guessed lang is French or German, hit up those Wikipedias for italics (possible names of works), otherwise default to English
+    # NOTE: not sure whether work names are italicized in other languages. TODO
+    print " grabbing italics... "
+    item = Wikidata::Item.find("Q#{tile.guess}")
+    site = case guessed_lang
+      when Q_GERMAN
+        'de'
+      when Q_FRENCH
+        'fr'
+      else
+        'en'
+      end
+    sitelinks = item.sitelinks
+    return nil if sitelinks.nil?
+    sitelink = sitelinks[site+'wiki']
+    if sitelink.nil? and site != 'en'
+      site = 'en' # fallback
+      sitelink = sitelinks[site+'wiki'] # and try again
+    end
+    return nil if sitelink.nil?
+    title = sitelink.title
+    src = mw[site].get_wikitext(title).body # grab wikitext
+    stripped = = src.gsub('[[','').gsub(']]','').gsub("'''",'')
+    italics = stripped.scan(/''.*?''/).map {|match| match[2..-3] } # grab expressions in italics, stripping the single quotes
+    return italics.join("\n")
+  end
   def get_tiles(numparam, lang)
     num = numparam.to_i || 1
     ret = []
@@ -142,7 +174,10 @@ module Authorlang
       unless tile.nil?
         lbl = label_for_guess(tile, lang)
         reason = reason_for_guess(tile, lang)
-        ret << {id: tile.id, sections: [{type: 'item', q: "Q#{tile.qid}"}, {type: 'text', text: "#{lbl} because #{reason}"}], controls: 
+        italics = tile.italics # sub needed?
+        text = "#{lbl} because #{reason}"
+        text += "\n\nThe following italicized text appears in the Wikipedia article:\n" + italics unless italics.nil?
+        ret << {id: tile.id, sections: [{type: 'item', q: "Q#{tile.qid}"}, {type: 'text', text: text}], controls: 
           [{type: 'buttons', 
           entries: 
             [{type: 'green', decision: 'yes', label: lbl, api_action: 
