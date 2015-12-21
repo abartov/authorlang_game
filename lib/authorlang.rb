@@ -65,8 +65,8 @@ module Authorlang
      if guess.empty?
        auth.status = NO_GUESS
      else
-       italics = italics_from_article(auth.qid, mw)
        auth.guess = guess[:guess]
+       italics = italics_from_article(auth.qid, mw, auth.guess)
        auth.heuristic = guess[:heuristic]
        auth.status = READY_FOR_HUMAN
        auth.other_qid = guess[:other_qid]
@@ -162,7 +162,7 @@ module Authorlang
     return nil if sitelink.nil?
     title = sitelink.title
     src = mw[site].get_wikitext(title).body # grab wikitext
-    stripped = = src.gsub('[[','').gsub(']]','').gsub("'''",'')
+    stripped = src.gsub('[[','').gsub(']]','').gsub("'''",'')
     italics = stripped.scan(/''.*?''/).map {|match| match[2..-3] } # grab expressions in italics, stripping the single quotes
     return italics.join("\n")
   end

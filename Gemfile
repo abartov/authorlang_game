@@ -25,7 +25,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'linkeddata'
 gem 'wikidata-client', '~> 0.0.9', require: 'wikidata'
-
+gem 'mediawiki_api'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
