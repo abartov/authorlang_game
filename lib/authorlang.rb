@@ -74,6 +74,7 @@ module Authorlang
        auth.italics = italics
      end
      auth.save!
+     puts 'done.'
     }
   end
 
