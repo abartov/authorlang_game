@@ -59,6 +59,7 @@ module Authorlang
     puts "coming up with some guesses..."
     a = Author.where(status: NONE).limit(max)
     return if a.nil?
+    done = 0
     a.each {|auth| 
      print "attempting to guess a language for Q#{auth.qid}..."
      guess = guess_lang(auth)
@@ -74,6 +75,8 @@ module Authorlang
        auth.italics = italics
      end
      auth.save!
+     done += 1
+     print "#{done}/#{max} " if done % 20 == 0
      puts 'done.'
     }
   end
