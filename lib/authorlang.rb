@@ -143,7 +143,7 @@ module Authorlang
     # heuristic: if guessed lang is French or German, hit up those Wikipedias for italics (possible names of works), otherwise default to English
     # NOTE: not sure whether work names are italicized in other languages. TODO
     print " grabbing italics... "
-    item = Wikidata::Item.find("Q#{tile.guess}")
+    item = Wikidata::Item.find("Q#{qid}")
     site = case guessed_lang
       when Q_GERMAN
         'de'
