@@ -168,6 +168,7 @@ module Authorlang
     src = mw[site].get_wikitext(title).body # grab wikitext
     stripped = src.gsub('[[','').gsub(']]','').gsub("'''",'')
     italics = stripped.scan(/''.*?''/).map {|match| match[2..-3] } # grab expressions in italics, stripping the single quotes
+    return nil if italics.empty?
     return italics.join("\n")
   end
   def get_tiles(numparam, lang)
