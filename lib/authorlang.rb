@@ -169,7 +169,7 @@ module Authorlang
     stripped = src.gsub('[[','').gsub(']]','').gsub("'''",'')
     italics = stripped.scan(/''.*?''/).map {|match| match[2..-3] } # grab expressions in italics, stripping the single quotes
     return nil if italics.empty?
-    return italics.join("\n")
+    return italics.join("; ")
   end
   def get_tiles(numparam, lang)
     num = numparam.to_i || 1
