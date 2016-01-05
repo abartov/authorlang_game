@@ -33,7 +33,7 @@ module Authorlang
     res = sparql.query("PREFIX wd: <http://www.wikidata.org/entity/>
       PREFIX wdt: <http://www.wikidata.org/prop/direct/>
       SELECT ?aid WHERE { 
-        { ?aid wdt:P106 wd:Q49757 } UNION {?aid wdt:P106 wd:Q214917} UNION {?aid wdt:P106 wd:Q36180} UNION {?aid wdt:P106 wd:Q482980} UNION {?aid wdt:P106 wd:Q11774202} UNION {?aid wdt:P106 wd:Q1930187}
+        { ?aid wdt:P106 wd:Q49757 } UNION {?aid wdt:P106 wd:Q214917} UNION {?aid wdt:P106 wd:Q36180} UNION {?aid wdt:P106 wd:Q482980} UNION {?aid wdt:P106 wd:Q11774202} UNION {?aid wdt:P106 wd:Q1930187} UNION {?aid wdt:P106 wd:Q28389}
         MINUS { ?aid wdt:P1412 ?lang }
       }")
     puts "#{res.count} results found. Processing..."
