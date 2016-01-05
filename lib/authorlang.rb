@@ -38,18 +38,20 @@ module Authorlang
       }")
     puts "#{res.count} results found. Processing..."
     i = 0
+    added = 0
     res.each {|item|
       puts "#{i} items processed. #{i/res.count.to_f*100}% done." if i % 200 == 0
       uri = item['aid'].to_s
       qnum = uri[uri.rindex('/')+2..-1]
       auth = Author.find_by_qid(qnum)
       if auth.nil?
+        added += 1
         auth = Author.new(qid: qnum, status: NONE)
         auth.save!
       end
       i += 1
     }
-    puts "done."
+    puts "done. #{added} new items added.  Total items now #{Author.count}."
   end
 
   def guess_langs(max)
