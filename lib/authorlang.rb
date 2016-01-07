@@ -183,7 +183,7 @@ module Authorlang
         reason = reason_for_guess(tile, lang)
         italics = tile.italics # sub needed?
         text = "#{lbl} because #{reason}"
-        text += "\n\nThe following italicized text appears in the Wikipedia article:\n" + italics unless italics.nil?
+        text += "\n\nThe following italicized text appears in the Wikipedia article:\n\n" + italics unless italics.nil?
         ret << {id: tile.id, sections: [{type: 'item', q: "Q#{tile.qid}"}, {type: 'text', text: text}], controls: 
           [{type: 'buttons', 
           entries: 
