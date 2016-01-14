@@ -25,6 +25,7 @@ Q_BELGIUM = 31
 Q_INDIA = 668
 Q_GERMAN = 188
 Q_FRENCH = 150
+Q_IRELAND = 27
 
 module Authorlang
   def ingest
@@ -103,6 +104,7 @@ module Authorlang
 
       # exceptions
       return ret if [Q_BELGIUM, Q_INDIA].include? country.id[1..-1].to_i # Make no assumptions about India, and don't mess with Belgian language politics :)
+      return {heuristic: CITIZENSHIP, guess: Q_ENGLISH, other_qid: Q_IRELAND} if country.id[1..-1].to_i == Q_IRELAND # infinitely more likely to be English than Irish
       off_langs = country.properties("P37")
       if off_langs.count > 0
         unless off_langs.first.nil?
