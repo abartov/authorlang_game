@@ -129,12 +129,12 @@ module Authorlang
   end
   def label_for_guess(tile, lang) 
     item = Wikidata::Item.find("Q#{tile.guess}")
-    return 'ERROR' if item.nil?
+    return "ERROR looking up Q#{tile.guess}" if item.nil?
     return item.labels[lang].value
   end
   def reason_for_guess(tile, lang)
     item = Wikidata::Item.find("Q#{tile.other_qid}")
-    return 'ERROR' if item.nil?
+    return "ERROR looking up Q#{tile.other_qid}" if item.nil?
     lbl = item.labels[lang].value
     lbl = item.labels['en'].value if lbl.nil? # fall back to English if no label requested lang
     lbl = item.labels.first if lbl.nil? # fall back to any label if no English
