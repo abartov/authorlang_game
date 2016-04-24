@@ -135,7 +135,7 @@ module Authorlang
   def reason_for_guess(tile, lang)
     item = Wikidata::Item.find("Q#{tile.other_qid}")
     return "ERROR looking up Q#{tile.other_qid}" if item.nil?
-    lbl = item.labels[lang].value
+    lbl = item.labels[lang].value unless item.labels[lang].nil?
     lbl = item.labels['en'].value if lbl.nil? # fall back to English if no label requested lang
     lbl = item.labels.first if lbl.nil? # fall back to any label if no English
     case tile.heuristic 
